@@ -9,35 +9,53 @@ sc_require('render_delegates/panel');
 
 SC.BaseTheme.pickerRenderDelegate = SC.RenderDelegate.create({
   className: 'picker',
-  
-  render: function(dataSource, context) {
-    var panelRenderDelegate = dataSource.get('theme').panelRenderDelegate;
 
+  render: function(dataSource, context) {
+    var panelRenderDelegate,
+        preferType,
+        pointerType,
+        pointerOffsetX,
+        pointerOffsetY;
+
+    panelRenderDelegate = dataSource.get('theme').panelRenderDelegate;
     panelRenderDelegate.render(dataSource, context);
 
-    var preferType = dataSource.get('preferType');
-    var pointerPosition = dataSource.get('pointerPos');
-    var pointerPositionY = dataSource.get('pointerPosY');
-
+    preferType = dataSource.get('preferType');
     if (preferType == SC.PICKER_POINTER || preferType == SC.PICKER_MENU_POINTER) {
-      context.push('<div class="sc-pointer ' + pointerPosition + '" style="margin-top: ' + pointerPositionY + 'px"></div>');
-      context.addClass(pointerPosition);
+      pointerType = dataSource.get('pointerPos');
+      pointerOffsetX = dataSource.get('pointerPosX');
+      pointerOffsetY = dataSource.get('pointerPosY');
+
+      context.push('<div class="sc-pointer ' + pointerType +
+          '" style="margin-top: ' + pointerOffsetY + 'px; margin-left: ' +
+          pointerOffsetX + 'px;"></div>');
+
+      context.addClass(pointerType);
     }
   },
-  
-  update: function(dataSource, $) {
-    var panelRenderDelegate = dataSource.get('theme').panelRenderDelegate;
-    panelRenderDelegate.update(dataSource, $);
-    
-    var preferType = dataSource.get('preferType');
-    var pointerPosition = dataSource.get('pointerPos');
-    var pointerPositionY = dataSource.get('pointerPosY');
 
+  update: function(dataSource, $) {
+    var el,
+        panelRenderDelegate,
+        preferType,
+        pointerType,
+        pointerOffsetX,
+        pointerOffsetY;
+
+    panelRenderDelegate = dataSource.get('theme').panelRenderDelegate;
+    panelRenderDelegate.update(dataSource, $);
+
+    preferType = dataSource.get('preferType');
     if (preferType == SC.PICKER_POINTER || preferType == SC.PICKER_MENU_POINTER) {
-      var el = $.find('.sc-pointer');
-      el.attr('class', "sc-pointer "+pointerPosition);
-      el.attr('style', "margin-top: "+pointerPositionY+"px");
-      $.addClass(pointerPosition);
+      pointerType = dataSource.get('pointerPos');
+      pointerOffsetX = dataSource.get('pointerPosX');
+      pointerOffsetY = dataSource.get('pointerPosY');
+
+      el = $.find('.sc-pointer');
+      el.attr('class', "sc-pointer " + pointerType);
+      el.attr('style', "margin-left: " + pointerOffsetX + "px");
+      el.attr('style', "margin-top: " + pointerOffsetY + "px");
+      $.addClass(pointerType);
     }
 
   }
