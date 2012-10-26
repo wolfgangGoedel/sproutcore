@@ -1788,6 +1788,20 @@ SC.ScrollView = SC.View.extend({
     if (this.get('isVisibleInWindow')) this._scsv_registerAutoscroll() ;
   },
 
+  /** @private */
+  destroy: function() {
+    sc_super();
+    // Undo this._scsv_registerAutoscroll().
+    SC.Drag.removeScrollableView(this);
+    // Remove contentView (first, so observers which require a containerView don't throw an error).
+    this.set('contentView', null);
+    // Remove scrollers.
+    this.set('horizontalScrollerView', null);
+    this.set('verticalScrollerView', null);
+    // Remove container view.
+    this.set('containerView', null);
+  }
+
   /** @private
     Registers/deregisters view with SC.Drag for autoscrolling
   */
