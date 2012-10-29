@@ -169,4 +169,30 @@
 
   });
 
+  test('Scroller fading', function() {
+    var view = pane.view('basic'),
+        verticalScroller = view.get('verticalScrollerView'),
+        opac;
+
+    stop(2000);
+    expect(2, 'All tests were run');
+    SC.RunLoop.begin();
+    verticalScroller.fadeOut(0.1);
+    SC.RunLoop.end();
+    setTimeout(function() {
+      opac = verticalScroller.getPath('layout.opacity');
+      equals(opac, 0, 'after fadeout, scroller opacity should equal zero');
+      SC.RunLoop.begin();
+      verticalScroller.fadeIn(0.1);
+      SC.RunLoop.end();
+      setTimeout(function() {
+        opac = verticalScroller.getPath('layout.opacity');
+        equals(opac, 1, 'after fadein, scroller opacity should equal 1');
+        start();
+      }, 200)
+
+    }, 200);
+
+  })
+
 })();
