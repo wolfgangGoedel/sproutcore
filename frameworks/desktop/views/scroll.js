@@ -1022,30 +1022,12 @@ SC.ScrollView = SC.View.extend({
 
   /** @private
     Triggers fade-out as soon as we're appended. (Note: this may not be working
-    with scroll views being appended at app load.)
+    with scroll views that are appended at app load.)
   */
   didAppendToDocument: function() {
     this._fade_horizontalScrollerShouldFadeOut();
     this._fade_verticalScrollerShouldFadeOut();
   },
-
-  _touchScrollDidChange: function(original) {
-    original();
-  }.enhance(),
-
-  _touchScrollDidEnd: function(original) {
-    original();
-  }.enhance(),
-
-  _scroll_horizontalScrollOffsetDidChange: function(original) {
-    original();
-  }.observes('horizontalScrollOffset').enhance(),
-
-  _scroll_verticalScrollOffsetDidChange: function(original) {
-    original();
-    this.invokeOnce(this._fade_verticalScrollerShouldFadeIn);
-    this.invokeOnce(this._fade_setupVerticalScrollerFadeout);
-  }.observes('verticalScrollOffset').enhance(),
 
   /** @private
     Fade horizontal scroller in.
