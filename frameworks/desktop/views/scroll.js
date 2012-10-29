@@ -1021,8 +1021,7 @@ SC.ScrollView = SC.View.extend({
   //
 
   /** @private
-    Triggers fade-out as soon as we're appended. (Note: this may not be working
-    with scroll views that are appended at app load.)
+    Triggers fade-out as soon as we're appended.
   */
   didAppendToDocument: function() {
     this._fade_horizontalScrollerShouldFadeOut();
@@ -1038,10 +1037,15 @@ SC.ScrollView = SC.View.extend({
     var scroller = this.get('horizontalScrollerView');
     if (!scroller || !scroller.get('isVisible')) return;
     
-    // Fade in if needed.
-    var currentOpacity = scroller.getPath('layout.opacity');
-    if (!SC.none(currentOpacity) && currentOpacity !== 1) {
-      scroller.animate('opacity', 1, this.get('fadeInDuration'));
+    // Tell the scroller to fade in, or fade it in with opacity as a fallback.
+    var duration = this.get('fadeInDuration');
+    if (scroller.fadeIn) {
+      scroller.fadeIn(duration);
+    } else {
+      var currentOpacity = scroller.getPath('layout.opacity');
+      if (!SC.none(currentOpacity) && currentOpacity !== 1) {
+        scroller.animate('opacity', 1, duration);
+      }
     }
     
     // Cancel fade-out timer.
@@ -1070,11 +1074,20 @@ SC.ScrollView = SC.View.extend({
     Fade the horizontal scroller out.
   */
   _fade_horizontalScrollerShouldFadeOut: function() {
+    // Gatekeep.
     if (!this.get('horizontalOverlay') || !this.get('horizontalFade')) return;
     var scroller = this.get('horizontalScrollerView');
-    if (!scroller) { return; }
+    if (!scroller || !scroller.get('isVisible')) { return; }
+
+    // Tell the scroller to fade itself out, or fade with animate as a fallback
     var duration = this.get('fadeOutDuration') || 0;
-    scroller.animate('opacity', 0, duration);
+    if (scroller.fadeOut) {
+      scroller.fadeOut(duration);
+    } else {
+      scroller.animate('opacity', 0, duration);
+    }
+
+    // Invalidate timer.
     if (this._horizontalFadeTimer) {
       this._horizontalFadeTimer.invalidate();
       this._horizontalFadeTimer = null;
@@ -1090,10 +1103,15 @@ SC.ScrollView = SC.View.extend({
     var scroller = this.get('verticalScrollerView');
     if (!scroller || !scroller.get('isVisible')) { return; }
     
-    // Fade in if needed.
-    var currentOpacity = scroller.getPath('layout.opacity');
-    if (!SC.none(currentOpacity) && currentOpacity !== 1) {
-      scroller.animate('opacity', 1, this.get('fadeInDuration'));
+    // Tell the scroller to fade in, or fade it in with opacity as a fallback.
+    var duration = this.get('fadeInDuration');
+    if (scroller.fadeIn) {
+      scroller.fadeIn(duration);
+    } else {
+      var currentOpacity = scroller.getPath('layout.opacity');
+      if (!SC.none(currentOpacity) && currentOpacity !== 1) {
+        scroller.animate('opacity', 1, duration);
+      }
     }
 
     // Cancel fade-out timer.
@@ -1122,11 +1140,20 @@ SC.ScrollView = SC.View.extend({
     Fade the vertical scroller out.
   */
   _fade_verticalScrollerShouldFadeOut: function() {
+    // Gatekeep.
     if (!this.get('verticalOverlay') || !this.get('verticalFade')) return;
     var scroller = this.get('verticalScrollerView');
     if (!scroller) { return; }
+
+    // Tell scroller to fade itself out, or fade with opacity as a fallback.
     var duration = this.get('fadeOutDuration') || 0;
-    scroller.animate('opacity', 0, duration);
+    if (scroller.fadeOut) {
+      scroller.fadeOut(duration);
+    } else {
+      scroller.animate('opacity', 0, duration);
+    }
+    
+    // Invalidate timer.
     if (this._verticalFadeTimer) {
       this._verticalFadeTimer.invalidate();
       this._verticalFadeTimer = null;

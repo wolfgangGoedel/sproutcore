@@ -505,6 +505,23 @@ SC.ScrollerView = SC.View.extend(
     return this.get('proportion') >= 1;
   }.property('proportion').cacheable(),
 
+  // ..........................................................
+  // FADE SUPPORT
+  // Controls how the scroller fades in and out. Override these methods to implement
+  // different fading.
+  //
+
+  fadeIn: function(duration) {
+    var currentOpacity = this.getPath('layout.opacity');
+    if (!SC.none(currentOpacity) && currentOpacity !== 1) {
+      this.animate('opacity', 1, duration);
+    }
+  },
+
+  fadeOut: function(duration) {
+    this.animate('opacity', 0, duration);
+  },
+
 
   // ..........................................................
   // MOUSE EVENTS
