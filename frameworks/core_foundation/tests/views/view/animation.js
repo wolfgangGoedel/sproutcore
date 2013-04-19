@@ -53,11 +53,13 @@ if (SC.platform.supportsCSSTransitions) {
     stop(2000);
     SC.RunLoop.begin();
     view.animate('left', 100, { duration: 1 });
+    ok(!view.get('isAnimating'), "The isAnimating property should be false.");
     SC.RunLoop.end();
 
     setTimeout(function () {
       equals(transitionFor(view), 'left 1s ease 0s', 'add transition');
       equals(100, view.get('layout').left, 'left is 100');
+      ok(view.get('isAnimating'), "The isAnimating property should be true.");
 
       start();
     }, 5);
@@ -82,6 +84,7 @@ if (SC.platform.supportsCSSTransitions) {
 
     SC.run(function () {
       view.animate('left', 100, 0.500, function () {
+        ok(!view.get('isAnimating'), "The isAnimating property should be false.");
         ok(true, "Callback was called.");
         equals(view, this, "`this` should be the view");
 

@@ -84,6 +84,24 @@ SC.View.reopen(
   /** @scope SC.View.prototype */ {
 
   /**
+    Whether the view is currently animating or not.
+
+    This property is true while the view has any running animations and false
+    otherwise.  Note that calling `animate()` will not necessarily result in
+    isAnimating being immediately true.  Only when the call to `animate()`
+    results in an animatable change and that animation has actually begun
+    (i.e. been applied to the layer) will `isAnimating` become true.
+
+    @field
+    @type Boolean
+    @default false
+    @since Version 1.10
+   */
+  isAnimating: function () {
+    return !!this.get('_activeAnimations');
+  }.property('_activeAnimations').cacheable(),
+
+  /**
     Method protocol.
 
     The method you provide to SC.View.prototype.animate should accept the
@@ -413,7 +431,7 @@ SC.View.reopen(
     @returns {SC.View} this
   */
   cancelAnimation: function (layoutState) {
-    var activeAnimations = this._activeAnimations,
+    var activeAnimations = this.get('_activeAnimations'),
       layout,
       didCancel = NO;
 
@@ -454,7 +472,7 @@ SC.View.reopen(
 
     // Clean up.
     delete this._prevLayout;
-    delete this._activeAnimations;
+    this.set('_activeAnimations', null);
 
     return this;
   },
@@ -476,7 +494,8 @@ SC.View.reopen(
       }
 
       // Reset the placeholder variables now that the layout style has been applied.
-      this._activeAnimations = this._pendingAnimations = null;
+      this._pendingAnimations = null;
+      this.set('_activeAnimations', null);
     }
   },
 
@@ -500,7 +519,7 @@ SC.View.reopen(
     @returns {Object}
   */
   liveAdjustments: function () {
-    var activeAnimations = this._activeAnimations,
+    var activeAnimations = this.get('_activeAnimations'),
       jqueryEl = this.$(),
       ret = {},
       transformKey = SC.browser.experimentalCSSNameFor('transform');
@@ -533,7 +552,7 @@ SC.View.reopen(
 
   /** @private Removes the animation CSS from the layer style. */
   removeAnimationFromLayout: function (propertyName, updateStyle) {
-    var activeAnimations = this._activeAnimations,
+    var activeAnimations = this.get('_activeAnimations'),
       layer = this.get('layer');
 
     if (!!layer && updateStyle) {
@@ -586,7 +605,7 @@ SC.View.reopen(
   */
   transitionDidEnd: function (evt) {
     var propertyName = evt.originalEvent.propertyName,
-      activeAnimations = this._activeAnimations,
+      activeAnimations = this.get('_activeAnimations'),
       animation = activeAnimations ? activeAnimations[propertyName] : null;
 
     if (animation) {
@@ -602,7 +621,7 @@ SC.View.reopen(
       // Clean up the internal hash.
       this._activeAnimationsLength -= 1;
       if (this._activeAnimationsLength === 0) {
-        delete this._activeAnimations;
+        this.set('_activeAnimations', null);
         delete this._prevLayout;
       }
     }
@@ -619,7 +638,7 @@ SC.View.reopen(
       var pendingAnimations = this._pendingAnimations;
 
       if (pendingAnimations) {
-        var activeAnimations = this._activeAnimations;
+        var activeAnimations = this.get('_activeAnimations');
 
         if (!activeAnimations) {
           this._activeAnimationsLength = 0;
@@ -640,7 +659,7 @@ SC.View.reopen(
           this._activeAnimationsLength += 1;
         }
 
-        this._activeAnimations = activeAnimations;
+        this.set('_activeAnimations', activeAnimations);
         this._pendingAnimations = null;
       }
     }
