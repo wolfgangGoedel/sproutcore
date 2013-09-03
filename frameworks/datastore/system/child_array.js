@@ -82,8 +82,15 @@ SC.ChildArray = SC.Object.extend(SC.Enumerable, SC.Array,
     @property
   */
   readOnlyChildren: function() {
-    return this.get('record').readAttribute(this.get('propertyName'));
+    var ret = this.get('record').readAttribute(this.get('propertyName'));
+    if (ret && SC.typeOf(ret) !== SC.T_ARRAY) {
+      ret = [ret];
+    }
+    return ret;
   }.property(),
+  //PATCHED: supports hashes, where children is an object, not an array
+  // useful when using nested records in SC and XML<>JSON conversion
+  // on the server
 
   /**
     Returns an editable array of child hashes.  Marks the owner records as
@@ -99,13 +106,15 @@ SC.ChildArray = SC.Object.extend(SC.Enumerable, SC.Array,
         ret, hash;
 
     ret = store.readEditableProperty(storeKey, pname);
-    if (!ret) {
+    if (!ret || SC.typeOf(ret) !== SC.T_ARRAY) {
       hash = store.readEditableDataHash(storeKey);
-      ret = hash[pname] = [];
+      ret = hash[pname] = ret ? [ret] : [];
     }
 
-    return ret ;
+    return ret;
   }.property(),
+  //PATCHED: see above
+
 
   // ..........................................................
   // ARRAY PRIMITIVES
