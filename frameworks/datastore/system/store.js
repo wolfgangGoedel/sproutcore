@@ -581,7 +581,7 @@ SC.Store = SC.Object.extend( /** @scope SC.Store.prototype */ {
           keys.add(key);
         }
       }
-      else {
+      else if (!statusOnly) {
         // Mark that all properties have changed.
         changes.propertyForStoreKeys[storeKey] = '*';
       }
@@ -590,6 +590,9 @@ SC.Store = SC.Object.extend( /** @scope SC.Store.prototype */ {
     this.invokeOnce(this.flush);
     return this;
   },
+  //PATCHED: if we add '*', we can have a situation where
+  // nested children notify '*' because the function is called
+  // twice for the key and with statusOnly (from parent)
 
   /**
     Delivers any pending changes to materialized records.  Normally this

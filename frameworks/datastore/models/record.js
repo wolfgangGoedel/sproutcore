@@ -348,14 +348,13 @@ SC.Record = SC.Object.extend(
     @param {String} key key that changed (optional)
     @returns {SC.Record} receiver
   */
-  recordDidChange: function(key) {
+  recordDidChange: function(key, statusOnly) {
 
     // If we have a parent, they changed too!
     var p = this.get('parentRecord');
-    if (p) p.recordDidChange();
+    if (p) p.recordDidChange(null, YES);
 
-    this.get('store').recordDidChange(null, null, this.get('storeKey'), key);
-    this.notifyPropertyChange('status');
+    this.get('store').recordDidChange(null, null, this.get('storeKey'), key, statusOnly);
 
     // If there are any aggregate records, we might need to propagate our new
     // status to them.
@@ -363,6 +362,9 @@ SC.Record = SC.Object.extend(
 
     return this ;
   },
+  //PATCHED: the way it was before, without the statusOnly param caused
+  // a '*' notification on every parent and, subsequently on all descendants
+  // when using nested records
 
   toJSON: function(){
     return this.get('attributes');
@@ -969,7 +971,7 @@ SC.Record = SC.Object.extend(
     // that we don't keep making new storeKeys for the same child record each
     // time that it is reloaded.
     id = hash[recordType.prototype.primaryKey];
-    if (!id) this.generateIdForChild(cr);
+    if (!id) id = this.generateIdForChild(hash);
     if (!id) { id = psk + '.' + path; }
 
     // If there is an id, there may also be a storeKey.  If so, update the
