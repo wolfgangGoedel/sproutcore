@@ -235,3 +235,41 @@ test("different contentKeys after creation are observed correctly", function() {
   equals(this.count, 3, "observer was not called again on setting old observed keys");
 });
 
+// ..........................................................
+// multiple contentKeys
+// 
+module("SC.ContentValueSupport#multipleContentKeys", {
+  setup: function() {
+    content = SC.Object.create({
+      val1: "one",
+      val2: "two"
+    });
+    view = SC.View.create(SC.ContentValueSupport, {
+      contentKeys: {
+        'contentValue1Key': 'value1',
+        'contentValue2Key': 'value2'
+      },
+      contentValue1Key: 'val1',
+      contentValue2Key: 'val2',
+      content: content
+    });
+  },
+
+  teardown: function() {
+    content = null;
+    view.destroy();
+    view = null;
+  }
+});
+
+test("multiple contentKeys on creation are observed correctly", function() {
+  equals(view.get('value1'), "one", "value1 is set correctly on init");
+  equals(view.get('value2'), "two", "value2 is set correctly on init");
+
+  content.set('val1', "ONE");
+  equals(view.get('value1'), "ONE", "value1 is updated correctly");
+
+  content.set('val2', "TWO")
+  equals(view.get('value2'), "TWO", "value2 is updated correctly");
+});
+
