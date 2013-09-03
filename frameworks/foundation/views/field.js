@@ -203,11 +203,16 @@ SC.FieldView = SC.View.extend(SC.Control, SC.Validatable,
     Allow the browser to do its normal event handling for the mouse down
     event.  But first, set isActive to YES.
   */
-  mouseDown: function(evt) {  
+  mouseDown: function(evt) {
+    if (this.get('isEnabled')) {
+      this.set('isActive', YES);
+    }
     this._field_isMouseDown = YES;
-    evt.allowDefault(); 
-    return YES; 
+    evt.allowDefault();
+    return YES;
   },
+  //PATCHED: It's in the comments, it wasn't in the code
+  // set isActive to YES (if enabled)
   
   /** @private
     Remove the active class on mouseExited if mouse is down.
